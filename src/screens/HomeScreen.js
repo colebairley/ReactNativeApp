@@ -138,7 +138,7 @@ export default function HomeScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Stock Social</Text>
-        <Text style={styles.subtitle}>9 React Native Tasks</Text>
+        <Text style={styles.subtitle}>10 React Native Tasks</Text>
       </View>
 
       <FlatList

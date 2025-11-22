@@ -1,18 +1,11 @@
-// Fetch Pokemon data from public API
-// Includes random failure simulation
-
 const POKEMON_API = 'https://pokeapi.co/api/v2/pokemon';
 
-// Simulating network delay to show skeleton feature
+// Helper to simulate network delay
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const fetchPokemonList = async () => {
-  /* Explanation of how failure simulation works:
-     We use Math.random() to generate a number between 0 and 1.
-     If this number is less than 0.1 (10% chance), we throw an error
-     to simulate a network failure or API timeout.
-  */
-  const shouldFail = Math.random() < 0.1;
+  // Simulate 10% chance of failure
+  const shouldFail = Math.random() < 0.3;
   
   if (shouldFail) {
     throw new Error('Failed to fetch Pokemon. Network error or API timeout.');
@@ -27,17 +20,28 @@ export const fetchPokemonList = async () => {
 
     const data = await response.json();
 
+    // Simulate 2 second network delay so you can see skeleton
     await delay(2000);
-    // Transform API data into simpler format
-    const pokemon = data.results.map((poke, index) => ({
-      id: index + 1,
-      name: poke.name.charAt(0).toUpperCase() + poke.name.slice(1),
-      url: poke.url,
-      imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/pokemon/other/official-artwork/${index + 1}.png`,
-    }));
 
+    // Transform API data into simpler format
+    const pokemon = data.results.map((poke) => {
+      // Extract ID from URL: https://pokeapi.co/api/v2/pokemon/1/ → 1
+      const urlParts = poke.url.split('/').filter(Boolean);
+      const id = urlParts[urlParts.length - 1];
+      
+      return {
+        id: parseInt(id),
+        name: poke.name.charAt(0).toUpperCase() + poke.name.slice(1),
+        url: poke.url,
+        // Use reliable CDN for images
+        imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png` ,
+      };
+    });
+
+    console.log('Pokemon loaded:',  pokemon[0].imageUrl, pokemon[0].url);
     return pokemon;
   } catch (error) {
+    console.error('Pokemon API error:', error);
     throw new Error(error.message || 'Failed to fetch Pokemon');
   }
 };

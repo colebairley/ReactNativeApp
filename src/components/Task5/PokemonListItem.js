@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import { useTheme } from '../../hooks/useTheme';
 
 export default function PokemonListItem({ pokemon }) {
   const { theme } = useTheme();
-  const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
 
   const styles = StyleSheet.create({
@@ -27,11 +26,12 @@ export default function PokemonListItem({ pokemon }) {
       borderRadius: 8,
       justifyContent: 'center',
       alignItems: 'center',
+      overflow: 'hidden',
     },
     image: {
-      width: 80,
-      height: 80,
-      borderRadius: 8,
+      width: '100%',
+      height: '100%',
+      resizeMode: 'contain',
     },
     content: {
       flex: 1,
@@ -52,23 +52,16 @@ export default function PokemonListItem({ pokemon }) {
     <View style={styles.container}>
       <View style={styles.imageContainer}>
         {imageError ? (
-          <Text style={{ fontSize: 40 }}>🤷</Text>
+          <Text style={{ fontSize: 40 }}>🎪</Text>
         ) : (
-          <>
-            {imageLoading && (
-              <ActivityIndicator color={theme.colors.primary} />
-            )}
-            <Image
-              source={{ uri: pokemon.imageUrl }}
-              style={[styles.image, imageLoading && { display: 'none' }]}
-              onLoadStart={() => setImageLoading(true)}
-              onLoadEnd={() => setImageLoading(false)}
-              onError={() => {
-                setImageError(true);
-                setImageLoading(false);
-              }}
-            />
-          </>
+          <Image
+            source={{ uri: pokemon.imageUrl }}
+            style={styles.image}
+            onError={() => {
+              console.log('Image failed to load:', pokemon.imageUrl);
+              setImageError(true);
+            }}
+          />
         )}
       </View>
       <View style={styles.content}>
